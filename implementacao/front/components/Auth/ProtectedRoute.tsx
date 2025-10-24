@@ -16,7 +16,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
   useEffect(() => {
     if (!loading && !user) {
       router.push('/signin');
-    } else if (!loading && user && requireAdmin && !user.roles.includes('ROLE_ADMIN')) {
+    } else if (!loading && user && requireAdmin && !user.roles.includes('ADMIN')) {
       router.push('/');
     }
   }, [user, loading, router, requireAdmin]);
@@ -33,7 +33,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
     return null;
   }
 
-  if (requireAdmin && !user.roles.includes('ROLE_ADMIN')) {
+  if (requireAdmin && !user.roles.includes('ADMIN')) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

@@ -52,23 +52,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/signin`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, senha: password }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        const { accessToken, id, name, email: userEmail, roles } = data;
+        const { token: accessToken, tipo, email: userEmail, nome } = data;
         
         const userData: User = {
-          id,
-          name,
+          id: 1, // ID fixo para ADMIN
+          name: nome || "Administrador",
           email: userEmail,
-          roles
+          roles: [tipo]
         };
 
         setToken(accessToken);

@@ -2,15 +2,20 @@ package com.merito.config;
 
 import com.merito.entity.*;
 import com.merito.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Configuration
 public class DataInitializer {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Bean
     CommandLineRunner initDatabase(
@@ -19,9 +24,17 @@ public class DataInitializer {
             ProfessorRepository professorRepository,
             EmpresaParceiraRepository empresaRepository,
             VantagemRepository vantagemRepository,
-            ResgateVantagemRepository resgateRepository) {
+            ResgateVantagemRepository resgateRepository,
+            UsuarioRepository usuarioRepository) {
         
         return args -> {
+            // Criar usuário ADMIN padrão
+            Usuario admin = new Usuario();
+            admin.setEmail("admin@admin.com");
+            admin.setSenha(passwordEncoder.encode("admin123"));
+            admin.setTipoUsuario("ADMIN");
+            usuarioRepository.save(admin);
+
             // Criar Instituições
             Instituicao pucMinas = new Instituicao();
             pucMinas.setNome("PUC Minas");
@@ -152,6 +165,9 @@ public class DataInitializer {
 
             System.out.println("========================================");
             System.out.println("✓ Banco de dados inicializado com dados de exemplo!");
+            System.out.println("✓ Usuário ADMIN criado:");
+            System.out.println("  - Email: admin@admin.com");
+            System.out.println("  - Senha: admin123");
             System.out.println("✓ Acesse o H2 Console em: http://localhost:8080/h2-console");
             System.out.println("✓ JDBC URL: jdbc:h2:mem:meritodb");
             System.out.println("✓ Username: sa");
