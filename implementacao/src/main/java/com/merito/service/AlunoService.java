@@ -6,6 +6,7 @@ import com.merito.entity.Aluno;
 import com.merito.entity.Instituicao;
 import com.merito.repository.AlunoRepository;
 import com.merito.repository.InstituicaoRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,9 @@ public class AlunoService {
     
     @Autowired
     private InstituicaoRepository instituicaoRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     // Create
     public AlunoDTO criarAluno(AlunoDTO alunoDTO) {
@@ -43,7 +47,7 @@ public class AlunoService {
         // Criar entidade
         Aluno aluno = new Aluno();
         aluno.setEmail(alunoDTO.getEmail());
-        aluno.setSenha(alunoDTO.getSenha()); // TODO: Implementar hash da senha
+        aluno.setSenha(passwordEncoder.encode(alunoDTO.getSenha())); // Hash da senha
         aluno.setTipoUsuario("ALUNO");
         aluno.setNome(alunoDTO.getNome());
         aluno.setCpf(alunoDTO.getCpf());
@@ -123,7 +127,7 @@ public class AlunoService {
         aluno.setNome(alunoUpdateDTO.getNome());
         aluno.setEmail(alunoUpdateDTO.getEmail());
         if (alunoUpdateDTO.getSenha() != null && !alunoUpdateDTO.getSenha().isEmpty()) {
-            aluno.setSenha(alunoUpdateDTO.getSenha()); // TODO: Implementar hash da senha
+            aluno.setSenha(passwordEncoder.encode(alunoUpdateDTO.getSenha())); // Hash da senha
         }
         aluno.setCpf(alunoUpdateDTO.getCpf());
         aluno.setRg(alunoUpdateDTO.getRg());

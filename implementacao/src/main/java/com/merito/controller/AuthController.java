@@ -3,6 +3,9 @@ package com.merito.controller;
 import com.merito.dto.LoginRequest;
 import com.merito.dto.LoginResponse;
 import com.merito.entity.Usuario;
+import com.merito.entity.Aluno;
+import com.merito.entity.Professor;
+import com.merito.entity.EmpresaParceira;
 import com.merito.repository.UsuarioRepository;
 import com.merito.util.JwtUtil;
 import jakarta.validation.Valid;
@@ -47,11 +50,6 @@ public class AuthController {
             
             Usuario usuario = usuarioOpt.get();
             
-            // Verificar se é ADMIN
-            if (!"ADMIN".equals(usuario.getTipoUsuario())) {
-                return ResponseEntity.badRequest().body("Acesso negado. Apenas administradores podem fazer login.");
-            }
-            
             // Verificar senha
             if (!passwordEncoder.matches(loginRequest.getSenha(), usuario.getSenha())) {
                 return ResponseEntity.badRequest().body("Credenciais inválidas");
@@ -61,11 +59,12 @@ public class AuthController {
             String token = jwtUtil.generateToken(usuario.getEmail(), usuario.getTipoUsuario());
             
             // Retornar resposta
+            String nomeUsuario = getNomeUsuario(usuario);
             LoginResponse response = new LoginResponse(
                 token,
                 usuario.getTipoUsuario(),
                 usuario.getEmail(),
-                "Administrador" // Nome fixo para ADMIN
+                nomeUsuario
             );
             
             return ResponseEntity.ok(response);
@@ -95,6 +94,30 @@ public class AuthController {
             
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Erro na validação: " + e.getMessage());
+        }
+    }
+    
+    private String getNomeUsuario(Usuario usuario) {
+        switch (usuario.getTipoUsuario()) {
+            case "ADMIN":
+                return "Administrador";
+            case "ALUNO":
+                if (usuario instanceof Aluno) {
+                    return ((Aluno) usuario).getNome();
+                }
+                return "Aluno";
+            case "PROFESSOR":
+                if (usuario instanceof Professor) {
+                    return ((Professor) usuario).getNome();
+                }
+                return "Professor";
+            case "EMPRESA":
+                if (usuario instanceof EmpresaParceira) {
+                    return ((EmpresaParceira) usuario).getNome();
+                }
+                return "Empresa";
+            default:
+                return "Usuário";
         }
     }
 }
