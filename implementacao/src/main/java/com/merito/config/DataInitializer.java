@@ -2,15 +2,20 @@ package com.merito.config;
 
 import com.merito.entity.*;
 import com.merito.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Configuration
 public class DataInitializer {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Bean
     CommandLineRunner initDatabase(
@@ -19,9 +24,17 @@ public class DataInitializer {
             ProfessorRepository professorRepository,
             EmpresaParceiraRepository empresaRepository,
             VantagemRepository vantagemRepository,
-            ResgateVantagemRepository resgateRepository) {
+            ResgateVantagemRepository resgateRepository,
+            UsuarioRepository usuarioRepository) {
         
         return args -> {
+            // Criar usuário ADMIN padrão
+            Usuario admin = new Usuario();
+            admin.setEmail("admin@admin.com");
+            admin.setSenha(passwordEncoder.encode("admin123"));
+            admin.setTipoUsuario("ADMIN");
+            usuarioRepository.save(admin);
+
             // Criar Instituições
             Instituicao pucMinas = new Instituicao();
             pucMinas.setNome("PUC Minas");
@@ -36,7 +49,7 @@ public class DataInitializer {
             // Criar Alunos
             Aluno aluno1 = new Aluno();
             aluno1.setEmail("joao.silva@aluno.pucminas.br");
-            aluno1.setSenha("senha123");
+            aluno1.setSenha(passwordEncoder.encode("senha123"));
             aluno1.setTipoUsuario("ALUNO");
             aluno1.setNome("João Silva");
             aluno1.setCpf("111.222.333-44");
@@ -49,7 +62,7 @@ public class DataInitializer {
 
             Aluno aluno2 = new Aluno();
             aluno2.setEmail("maria.santos@aluno.pucminas.br");
-            aluno2.setSenha("senha456");
+            aluno2.setSenha(passwordEncoder.encode("senha456"));
             aluno2.setTipoUsuario("ALUNO");
             aluno2.setNome("Maria Santos");
             aluno2.setCpf("555.666.777-88");
@@ -63,7 +76,7 @@ public class DataInitializer {
             // Criar Professores
             Professor prof1 = new Professor();
             prof1.setEmail("carlos.oliveira@pucminas.br");
-            prof1.setSenha("prof123");
+            prof1.setSenha(passwordEncoder.encode("prof123"));
             prof1.setTipoUsuario("PROFESSOR");
             prof1.setNome("Carlos Oliveira");
             prof1.setCpf("999.888.777-66");
@@ -74,7 +87,7 @@ public class DataInitializer {
 
             Professor prof2 = new Professor();
             prof2.setEmail("ana.costa@ufmg.br");
-            prof2.setSenha("prof456");
+            prof2.setSenha(passwordEncoder.encode("prof456"));
             prof2.setTipoUsuario("PROFESSOR");
             prof2.setNome("Ana Costa");
             prof2.setCpf("444.333.222-11");
@@ -86,7 +99,7 @@ public class DataInitializer {
             // Criar Empresas Parceiras
             EmpresaParceira empresa1 = new EmpresaParceira();
             empresa1.setEmail("contato@techstore.com.br");
-            empresa1.setSenha("emp123");
+            empresa1.setSenha(passwordEncoder.encode("emp123"));
             empresa1.setTipoUsuario("EMPRESA");
             empresa1.setNome("Tech Store");
             empresa1.setCnpj("12.345.678/0001-90");
@@ -95,7 +108,7 @@ public class DataInitializer {
 
             EmpresaParceira empresa2 = new EmpresaParceira();
             empresa2.setEmail("contato@livrariaonline.com.br");
-            empresa2.setSenha("emp456");
+            empresa2.setSenha(passwordEncoder.encode("emp456"));
             empresa2.setTipoUsuario("EMPRESA");
             empresa2.setNome("Livraria Online");
             empresa2.setCnpj("98.765.432/0001-10");
@@ -152,6 +165,9 @@ public class DataInitializer {
 
             System.out.println("========================================");
             System.out.println("✓ Banco de dados inicializado com dados de exemplo!");
+            System.out.println("✓ Usuário ADMIN criado:");
+            System.out.println("  - Email: admin@admin.com");
+            System.out.println("  - Senha: admin123");
             System.out.println("✓ Acesse o H2 Console em: http://localhost:8080/h2-console");
             System.out.println("✓ JDBC URL: jdbc:h2:mem:meritodb");
             System.out.println("✓ Username: sa");

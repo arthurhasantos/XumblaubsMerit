@@ -1,6 +1,6 @@
 # Sistema de Mérito Acadêmico
 
-Sistema de gestão de mérito acadêmico baseado em moedas virtuais, desenvolvido com Spring Boot, JPA e banco de dados H2.
+Sistema de gestão de mérito acadêmico baseado em moedas virtuais, desenvolvido com **Spring Boot** (backend) e **Next.js** (frontend), utilizando JPA e banco de dados H2.
 
 ## 📋 Descrição
 
@@ -12,12 +12,23 @@ Este sistema implementa um modelo de mérito acadêmico onde:
 
 ## 🏗️ Estrutura do Projeto
 
-O projeto segue o padrão de arquitetura em camadas:
+O projeto segue o padrão de arquitetura em camadas com **Backend** (Spring Boot) e **Frontend** (Next.js):
 
 ```
 implementacao/
-├── src/main/java/com/merito/
+├── src/main/java/com/merito/         # BACKEND - Spring Boot
 │   ├── Application.java              # Classe principal da aplicação
+│   ├── config/                       # Configurações
+│   │   ├── DataInitializer.java      # Inicialização de dados de exemplo
+│   │   └── WebConfig.java            # Configuração CORS
+│   ├── controller/                   # Controllers REST
+│   │   ├── AlunoController.java      # CRUD Aluno
+│   │   ├── EmpresaParceiraController.java # CRUD Empresa Parceira
+│   │   ├── InstituicaoController.java # CRUD Instituição
+│   │   └── TestController.java       # Endpoints de teste
+│   ├── dto/                          # Data Transfer Objects
+│   │   ├── AlunoDTO.java             # DTO para Aluno
+│   │   └── EmpresaParceiraDTO.java   # DTO para Empresa Parceira
 │   ├── entity/                       # Entidades JPA
 │   │   ├── Aluno.java
 │   │   ├── EmpresaParceira.java
@@ -34,11 +45,28 @@ implementacao/
 │   │   ├── ResgateVantagemRepository.java
 │   │   ├── UsuarioRepository.java
 │   │   └── VantagemRepository.java
-│   └── config/
-│       └── DataInitializer.java      # Inicialização de dados de exemplo
+│   └── service/                      # Camada de Serviço
+│       ├── AlunoService.java         # Lógica de negócio Aluno
+│       └── EmpresaParceiraService.java # Lógica de negócio Empresa
+├── front/                            # FRONTEND - Next.js
+│   ├── app/                          # App Router (Next.js 13+)
+│   │   ├── layout.tsx                # Layout principal
+│   │   ├── page.tsx                  # Página inicial
+│   │   └── signin/                   # Páginas de autenticação
+│   ├── components/                   # Componentes React
+│   │   ├── Header/                   # Cabeçalho
+│   │   ├── Footer/                   # Rodapé
+│   │   └── Auth/                     # Componentes de autenticação
+│   ├── contexts/                     # Contextos React
+│   ├── lib/                          # Utilitários
+│   ├── public/                       # Arquivos estáticos
+│   ├── styles/                       # Estilos CSS
+│   └── types/                        # Tipos TypeScript
 ├── src/main/resources/
 │   └── application.properties        # Configurações da aplicação
-└── pom.xml                           # Dependências Maven
+├── pom.xml                           # Dependências Maven (Backend)
+├── package.json                      # Dependências NPM (Frontend)
+└── API_CRUD_DOCUMENTATION.md         # Documentação da API
 ```
 
 ## 🗄️ Modelo de Dados
@@ -83,31 +111,61 @@ implementacao/
 
 ### Pré-requisitos
 
+**Backend:**
 - Java 17 ou superior
 - Maven 3.6 ou superior
 
+**Frontend:**
+- Node.js 18 ou superior
+- npm ou yarn
+
 ### Passos para execução
 
-1. **Navegue até o diretório do projeto:**
-   ```bash
-   cd implementacao
-   ```
+#### **1. Backend (Spring Boot)**
 
-2. **Compile o projeto:**
-   ```bash
-   mvn clean install
-   ```
+```bash
+# Navegue até o diretório do projeto
+cd implementacao
 
-3. **Execute a aplicação:**
-   ```bash
-   mvn spring-boot:run
-   ```
+# Compile o projeto
+mvn clean compile
 
-4. **Acesse o H2 Console:**
-   - URL: http://localhost:8080/h2-console
-   - JDBC URL: `jdbc:h2:mem:meritodb`
-   - Username: `sa`
-   - Password: (deixe em branco)
+# Execute a aplicação
+mvn spring-boot:run
+```
+
+#### **2. Frontend (Next.js)**
+
+```bash
+# Navegue até o diretório do frontend
+cd implementacao/front
+
+# Instale as dependências (primeira vez)
+npm install
+
+# Execute em modo desenvolvimento
+npm run dev
+```
+
+### **🌐 URLs de Acesso**
+
+- **Frontend:** http://localhost:3000
+- **Backend API:** http://localhost:8080/api
+- **H2 Console:** http://localhost:8080/h2-console
+  - JDBC URL: `jdbc:h2:mem:meritodb`
+  - Username: `sa`
+  - Password: (deixe em branco)
+
+### **🔑 Credenciais de Acesso**
+
+**Usuário Administrador:**
+- **Email:** `admin@admin.com`
+- **Senha:** `admin123`
+
+**Usuários de Exemplo:**
+- **Aluno:** `joao.silva@aluno.pucminas.br` / `senha123`
+- **Professor:** `carlos.oliveira@pucminas.br` / `prof123`
+- **Empresa:** `contato@techstore.com.br` / `emp123`
 
 ## 🔧 Configuração
 
@@ -175,12 +233,66 @@ A aplicação é inicializada com dados de exemplo através da classe `DataIniti
 - `findByDataResgateBetween(LocalDateTime inicio, LocalDateTime fim)` - Buscar resgates por período
 - `findByAlunoOrderByDataResgateDesc(Aluno aluno)` - Histórico de resgates do aluno
 
+## 🚀 Funcionalidades Implementadas
+
+### **CRUDs Completos**
+- ✅ **CRUD Aluno** - Cadastro, listagem, busca, atualização e exclusão
+- ✅ **CRUD Empresa Parceira** - Cadastro, listagem, busca, atualização e exclusão
+- ✅ **CRUD Instituição** - Operações básicas de instituições
+
+### **API REST**
+- ✅ **17 endpoints** implementados
+- ✅ **Validação de dados** com Bean Validation
+- ✅ **Tratamento de erros** padronizado
+- ✅ **CORS configurado** para frontend
+- ✅ **Documentação da API** completa
+- ✅ **Autenticação JWT** implementada
+- ✅ **Controle de acesso** por roles (ADMIN)
+- ✅ **Hash de senhas** com BCrypt
+
+### **Frontend**
+- ✅ **Interface responsiva** com Tailwind CSS
+- ✅ **Tema escuro/claro** com Next Themes
+- ✅ **Componentes reutilizáveis** organizados
+- ✅ **Formulários** com React Hook Form
+- ✅ **Notificações** com React Hot Toast
+- ✅ **Autenticação** com Context API
+- ✅ **Modais** para CRUD operations
+- ✅ **Proteção de rotas** por roles
+
+### **Banco de Dados**
+- ✅ **H2 em memória** para desenvolvimento
+- ✅ **Console H2** para consultas SQL
+- ✅ **Dados de exemplo** carregados automaticamente
+- ✅ **Logs SQL** para debugging
+
 ## 🛠️ Tecnologias Utilizadas
 
+### **Backend (Spring Boot)**
 - **Spring Boot 3.1.5** - Framework principal
 - **Spring Data JPA** - Abstração de acesso a dados
+- **Spring Boot Validation** - Validação de dados
+- **Spring Security** - Autenticação e autorização
+- **JWT (JSON Web Tokens)** - Autenticação stateless
+- **BCrypt** - Hash de senhas
 - **H2 Database** - Banco de dados em memória
 - **Maven** - Gerenciamento de dependências
+- **Java 17** - Linguagem de programação
+
+### **Frontend (Next.js)**
+- **Next.js 13.5.6** - Framework React
+- **React 18.2.0** - Biblioteca de interface
+- **TypeScript 5.2.2** - Tipagem estática
+- **Tailwind CSS 3.3.5** - Framework CSS
+- **React Hook Form 7.47.0** - Gerenciamento de formulários
+- **React Hot Toast 2.4.1** - Notificações
+- **Next Themes 0.2.1** - Gerenciamento de temas
+
+### **Ferramentas de Desenvolvimento**
+- **ESLint** - Linting de código
+- **Prettier** - Formatação de código
+- **PostCSS** - Processamento CSS
+- **Autoprefixer** - Prefixos CSS automáticos
 
 **Nota:** Este projeto **não usa Lombok**. Todos os getters, setters e construtores foram implementados manualmente para garantir máxima compatibilidade e facilidade de debugging.
 
@@ -191,17 +303,48 @@ O projeto utiliza a estratégia **JOINED** para herança JPA:
 - Tabelas `aluno`, `professor` e `empresa_parceira` contêm campos específicos
 - Relacionamento via chave estrangeira que também é chave primária
 
+## 🎯 Próximos Passos
+
+### **Sprint Atual - Concluída ✅**
+- ✅ CRUDs de Aluno e Empresa Parceira
+- ✅ Frontend básico com Next.js
+- ✅ Configuração H2 para desenvolvimento
+- ✅ Documentação da API
+- ✅ Autenticação JWT implementada
+- ✅ Controle de acesso por roles (ADMIN)
+- ✅ Hash de senhas com BCrypt
+- ✅ Modais elegantes para CRUD
+- ✅ Notificações com React Hot Toast
+
+### **Próximas Sprints**
+- 🔄 **Autenticação e Segurança** ✅ **CONCLUÍDO**
+  - ✅ Implementar JWT
+  - ✅ Hash de senhas com BCrypt
+  - ✅ Controle de acesso por roles
+- 🔄 **CRUDs Restantes**
+  - CRUD Professor
+  - CRUD Vantagem
+  - CRUD ResgateVantagem
+- 🔄 **Funcionalidades de Negócio**
+  - Distribuição de moedas
+  - Sistema de notificações por email
+  - Relatórios e dashboards
+- 🔄 **Melhorias no Frontend**
+  - Páginas de CRUD completas
+  - Dashboard administrativo
+  - Interface para alunos e professores
+
 ## 🔐 Observações de Segurança
 
 ⚠️ **ATENÇÃO**: Este é um projeto de demonstração. Para uso em produção:
-- Implemente hash de senhas (BCrypt)
-- Adicione autenticação JWT/OAuth2
-- Configure HTTPS
-- Implemente validações de entrada
-- Adicione tratamento de exceções robusto
-- Configure CORS adequadamente
+- ✅ **Hash de senhas (BCrypt)** - Implementado
+- ✅ **Autenticação JWT** - Implementado
+- 🔄 Configure HTTPS
+- ✅ **Validações de entrada** - Implementado com Bean Validation
+- ✅ **Tratamento de exceções** - Implementado
+- ✅ **CORS configurado** - Implementado
 
 ## 📄 Licença
 
-Este projeto é parte de um sistema acadêmico de demonstração.
+Este projeto é parte de um sistema acadêmico de demonstração desenvolvido para o curso de LDS (Laboratório de Desenvolvimento de Software) da PUC Minas.
 
