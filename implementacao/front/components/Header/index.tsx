@@ -46,155 +46,146 @@ const Header = () => {
       <header
         className={`header left-0 top-0 z-40 flex w-full items-center ${
           sticky
-            ? "dark:bg-gray-dark dark:shadow-sticky-dark fixed z-[9999] bg-white !bg-opacity-80 shadow-sticky backdrop-blur-sm transition"
+            ? "fixed z-[9999] bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg border-b border-gray-200/20 dark:border-gray-700/20 transition-all duration-300"
             : "absolute bg-transparent"
         }`}
       >
-        <div className="container">
-          <div className="relative -mx-4 flex items-center justify-between">
-            <div className="w-60 max-w-full px-4 xl:mr-12">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16 lg:h-20">
+            {/* Logo */}
+            <div className="flex-shrink-0">
               <Link
                 href="/"
-                className={`header-logo block w-full ${
-                  sticky ? "py-5 lg:py-2" : "py-8"
-                } `}
+                className="flex items-center space-x-3 group"
               >
-                <Image
-                  src="/images/logo/logo-2.svg"
-                  alt="logo"
-                  width={140}
-                  height={30}
-                  className="w-full dark:hidden"
-                />
-                <Image
-                  src="/images/logo/logo.svg"
-                  alt="logo"
-                  width={140}
-                  height={30}
-                  className="hidden w-full dark:block"
-                />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                  <span className="text-white font-bold text-xl">M</span>
+                </div>
+                <span className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+                  Merit
+                </span>
               </Link>
             </div>
-            <div className="flex w-full items-center justify-between px-4">
-              <div>
-                <button
-                  onClick={navbarToggleHandler}
-                  id="navbarToggler"
-                  aria-label="Mobile Menu"
-                  className="absolute right-4 top-1/2 block translate-y-[-50%] rounded-lg px-3 py-[6px] ring-primary focus:ring-2 lg:hidden"
-                >
-                  <span
-                    className={`relative my-1.5 block h-0.5 w-[30px] bg-black transition-all duration-300 dark:bg-white ${
-                      navbarOpen ? " top-[7px] rotate-45" : " "
-                    }`}
-                  />
-                  <span
-                    className={`relative my-1.5 block h-0.5 w-[30px] bg-black transition-all duration-300 dark:bg-white ${
-                      navbarOpen ? "opacity-0 " : " "
-                    }`}
-                  />
-                  <span
-                    className={`relative my-1.5 block h-0.5 w-[30px] bg-black transition-all duration-300 dark:bg-white ${
-                      navbarOpen ? " top-[-8px] -rotate-45" : " "
-                    }`}
-                  />
-                </button>
-                <nav
-                  id="navbarCollapse"
-                  className={`navbar absolute right-0 z-30 w-[250px] rounded border-[.5px] border-body-color/50 bg-white px-6 py-4 duration-300 dark:border-body-color/20 dark:bg-dark lg:visible lg:static lg:w-auto lg:border-none lg:!bg-transparent lg:p-0 lg:opacity-100 ${
-                    navbarOpen
-                      ? "visibility top-full opacity-100"
-                      : "invisible top-[120%] opacity-0"
-                  }`}
-                >
-                  <ul className="block lg:flex lg:space-x-12">
-                    {menuData
-                      .filter((menuItem) => {
-                        // Se o item requer admin, verificar se o usuário é admin
-                        if (menuItem.requireAdmin) {
-                          return user && user.roles.includes('ROLE_ADMIN');
-                        }
-                        // Se não requer admin, mostrar para todos
-                        return true;
-                      })
-                      .map((menuItem, index) => (
-                      <li key={index} className="group relative">
-                        {menuItem.path ? (
-                          <Link
-                            href={menuItem.path}
-                            className={`flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 ${
-                              usePathName === menuItem.path
-                                ? "text-primary dark:text-white"
-                                : "text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
-                            }`}
-                          >
-                            {menuItem.title}
-                          </Link>
-                        ) : (
-                          <>
-                            <p
-                              onClick={() => handleSubmenu(index)}
-                              className="flex cursor-pointer items-center justify-between py-2 text-base text-dark group-hover:text-primary dark:text-white/70 dark:group-hover:text-white lg:mr-0 lg:inline-flex lg:px-0 lg:py-6"
-                            >
-                              {menuItem.title}
-                              <span className="pl-3">
-                                <svg width="25" height="24" viewBox="0 0 25 24">
-                                  <path
-                                    fillRule="evenodd"
-                                    clipRule="evenodd"
-                                    d="M6.29289 8.8427C6.68342 8.45217 7.31658 8.45217 7.70711 8.8427L12 13.1356L16.2929 8.8427C16.6834 8.45217 17.3166 8.45217 17.7071 8.8427C18.0976 9.23322 18.0976 9.86639 17.7071 10.2569L12 15.964L6.29289 10.2569C5.90237 9.86639 5.90237 9.23322 6.29289 8.8427Z"
-                                    fill="currentColor"
-                                  />
-                                </svg>
-                              </span>
-                            </p>
-                            <div
-                              className={`submenu relative left-0 top-full rounded-sm bg-white transition-[top] duration-300 group-hover:opacity-100 dark:bg-dark lg:invisible lg:absolute lg:top-[110%] lg:block lg:w-[250px] lg:p-4 lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full ${
-                                openIndex === index ? "block" : "hidden"
-                              }`}
-                            >
-                              {menuItem.submenu.map((submenuItem, index) => (
-                                <Link
-                                  href={submenuItem.path}
-                                  key={index}
-                                  className="block rounded py-2.5 text-sm text-dark hover:text-primary dark:text-white/70 dark:hover:text-white lg:px-3"
-                                >
-                                  {submenuItem.title}
-                                </Link>
-                              ))}
-                            </div>
-                          </>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-              </div>
-              <div className="flex items-center justify-end pr-16 lg:pr-0">
-                {user ? (
-                  <div className="flex items-center space-x-4">
-                    <span className="hidden text-base font-medium text-dark dark:text-white md:block">
-                      Olá, {user.name}
-                    </span>
-                    <button
-                      onClick={logout}
-                      className="ease-in-up shadow-btn hover:shadow-btn-hover hidden rounded-sm bg-red-500 px-8 py-3 text-base font-medium text-white transition duration-300 hover:bg-opacity-90 md:block md:px-9 lg:px-6 xl:px-9"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                ) : (
+
+            {/* Navigation */}
+            <div className="hidden lg:flex lg:items-center lg:space-x-8">
+              {menuData
+                .filter((menuItem) => {
+                  if (!user) return false;
+                  if (menuItem.requireAdmin) {
+                    return user.roles.includes('ADMIN');
+                  }
+                  return true;
+                })
+                .map((menuItem, index) => (
                   <Link
-                    href="/signin"
-                    className="ease-in-up shadow-btn hover:shadow-btn-hover hidden rounded-sm bg-primary px-8 py-3 text-base font-medium text-white transition duration-300 hover:bg-opacity-90 md:block md:px-9 lg:px-6 xl:px-9"
+                    key={index}
+                    href={menuItem.path}
+                    className={`relative px-3 py-2 text-sm font-medium transition-all duration-300 rounded-lg ${
+                      usePathName === menuItem.path
+                        ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                        : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                    }`}
                   >
-                    Login
+                    {menuItem.title}
                   </Link>
-                )}
-                <div>
-                  <ThemeToggler />
+                ))}
+            </div>
+
+            {/* User Actions */}
+            <div className="flex items-center space-x-4">
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  {/* User Info */}
+                  <div className="hidden md:flex items-center space-x-3 px-4 py-2 bg-gray-50 dark:bg-gray-800 rounded-full">
+                    <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm font-medium">
+                        {user.name?.charAt(0) || 'A'}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {user.name}
+                    </span>
+                  </div>
+                  
+                  {/* Logout Button */}
+                  <button
+                    onClick={logout}
+                    className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Logout</span>
+                  </button>
                 </div>
+              ) : (
+                <Link
+                  href="/signin"
+                  className="flex items-center space-x-2 px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Login</span>
+                </Link>
+              )}
+
+              {/* Theme Toggle */}
+              <div className="ml-2">
+                <ThemeToggler />
               </div>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={navbarToggleHandler}
+                className="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-300"
+                aria-label="Toggle menu"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {navbarOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          <div
+            className={`lg:hidden transition-all duration-300 ease-in-out ${
+              navbarOpen
+                ? "max-h-96 opacity-100 pb-4"
+                : "max-h-0 opacity-0 overflow-hidden"
+            }`}
+          >
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <nav className="flex flex-col space-y-2">
+                {menuData
+                  .filter((menuItem) => {
+                    if (!user) return false;
+                    if (menuItem.requireAdmin) {
+                      return user.roles.includes('ADMIN');
+                    }
+                    return true;
+                  })
+                  .map((menuItem, index) => (
+                    <Link
+                      key={index}
+                      href={menuItem.path}
+                      className={`px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 ${
+                        usePathName === menuItem.path
+                          ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                          : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                      }`}
+                      onClick={() => setNavbarOpen(false)}
+                    >
+                      {menuItem.title}
+                    </Link>
+                  ))}
+              </nav>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 package com.merito.service;
 
 import com.merito.dto.EmpresaParceiraDTO;
+import com.merito.dto.EmpresaUpdateDTO;
 import com.merito.entity.EmpresaParceira;
 import com.merito.repository.EmpresaParceiraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,28 +75,28 @@ public class EmpresaParceiraService {
     }
     
     // Update
-    public EmpresaParceiraDTO atualizarEmpresa(Long id, EmpresaParceiraDTO empresaDTO) {
+    public EmpresaParceiraDTO atualizarEmpresa(Long id, EmpresaUpdateDTO empresaUpdateDTO) {
         EmpresaParceira empresa = empresaParceiraRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empresa não encontrada com ID: " + id));
         
         // Validar se CNPJ já existe em outra empresa
-        if (!empresa.getCnpj().equals(empresaDTO.getCnpj()) && empresaParceiraRepository.existsByCnpj(empresaDTO.getCnpj())) {
-            throw new RuntimeException("CNPJ já cadastrado: " + empresaDTO.getCnpj());
+        if (!empresa.getCnpj().equals(empresaUpdateDTO.getCnpj()) && empresaParceiraRepository.existsByCnpj(empresaUpdateDTO.getCnpj())) {
+            throw new RuntimeException("CNPJ já cadastrado: " + empresaUpdateDTO.getCnpj());
         }
         
         // Validar se email já existe em outra empresa
-        if (!empresa.getEmail().equals(empresaDTO.getEmail()) && empresaParceiraRepository.existsByEmail(empresaDTO.getEmail())) {
-            throw new RuntimeException("Email já cadastrado: " + empresaDTO.getEmail());
+        if (!empresa.getEmail().equals(empresaUpdateDTO.getEmail()) && empresaParceiraRepository.existsByEmail(empresaUpdateDTO.getEmail())) {
+            throw new RuntimeException("Email já cadastrado: " + empresaUpdateDTO.getEmail());
         }
         
         // Atualizar campos
-        empresa.setNome(empresaDTO.getNome());
-        empresa.setEmail(empresaDTO.getEmail());
-        if (empresaDTO.getSenha() != null && !empresaDTO.getSenha().isEmpty()) {
-            empresa.setSenha(empresaDTO.getSenha()); // TODO: Implementar hash da senha
+        empresa.setNome(empresaUpdateDTO.getNome());
+        empresa.setEmail(empresaUpdateDTO.getEmail());
+        if (empresaUpdateDTO.getSenha() != null && !empresaUpdateDTO.getSenha().isEmpty()) {
+            empresa.setSenha(empresaUpdateDTO.getSenha()); // TODO: Implementar hash da senha
         }
-        empresa.setCnpj(empresaDTO.getCnpj());
-        empresa.setEmailContato(empresaDTO.getEmailContato());
+        empresa.setCnpj(empresaUpdateDTO.getCnpj());
+        empresa.setEmailContato(empresaUpdateDTO.getEmailContato());
         
         // Salvar
         EmpresaParceira empresaAtualizada = empresaParceiraRepository.save(empresa);

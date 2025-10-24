@@ -1,6 +1,7 @@
 package com.merito.controller;
 
 import com.merito.dto.AlunoDTO;
+import com.merito.dto.AlunoUpdateDTO;
 import com.merito.service.AlunoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,9 +91,9 @@ public class AlunoController {
     
     // PUT /api/alunos/{id} - Atualizar aluno
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizarAluno(@PathVariable Long id, @Valid @RequestBody AlunoDTO alunoDTO) {
+    public ResponseEntity<?> atualizarAluno(@PathVariable Long id, @Valid @RequestBody AlunoUpdateDTO alunoUpdateDTO) {
         try {
-            AlunoDTO alunoAtualizado = alunoService.atualizarAluno(id, alunoDTO);
+            AlunoDTO alunoAtualizado = alunoService.atualizarAluno(id, alunoUpdateDTO);
             return ResponseEntity.ok(alunoAtualizado);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("Erro: " + e.getMessage());

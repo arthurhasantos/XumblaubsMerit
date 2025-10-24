@@ -1,6 +1,7 @@
 package com.merito.service;
 
 import com.merito.dto.AlunoDTO;
+import com.merito.dto.AlunoUpdateDTO;
 import com.merito.entity.Aluno;
 import com.merito.entity.Instituicao;
 import com.merito.repository.AlunoRepository;
@@ -97,39 +98,39 @@ public class AlunoService {
     }
     
     // Update
-    public AlunoDTO atualizarAluno(Long id, AlunoDTO alunoDTO) {
+    public AlunoDTO atualizarAluno(Long id, AlunoUpdateDTO alunoUpdateDTO) {
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado com ID: " + id));
         
         // Validar se CPF já existe em outro aluno
-        if (!aluno.getCpf().equals(alunoDTO.getCpf()) && alunoRepository.existsByCpf(alunoDTO.getCpf())) {
-            throw new RuntimeException("CPF já cadastrado: " + alunoDTO.getCpf());
+        if (!aluno.getCpf().equals(alunoUpdateDTO.getCpf()) && alunoRepository.existsByCpf(alunoUpdateDTO.getCpf())) {
+            throw new RuntimeException("CPF já cadastrado: " + alunoUpdateDTO.getCpf());
         }
         
         // Validar se email já existe em outro aluno
-        if (!aluno.getEmail().equals(alunoDTO.getEmail()) && alunoRepository.existsByEmail(alunoDTO.getEmail())) {
-            throw new RuntimeException("Email já cadastrado: " + alunoDTO.getEmail());
+        if (!aluno.getEmail().equals(alunoUpdateDTO.getEmail()) && alunoRepository.existsByEmail(alunoUpdateDTO.getEmail())) {
+            throw new RuntimeException("Email já cadastrado: " + alunoUpdateDTO.getEmail());
         }
         
         // Buscar instituição se mudou
-        if (!aluno.getInstituicao().getId().equals(alunoDTO.getInstituicaoId())) {
-            Instituicao instituicao = instituicaoRepository.findById(alunoDTO.getInstituicaoId())
-                    .orElseThrow(() -> new RuntimeException("Instituição não encontrada com ID: " + alunoDTO.getInstituicaoId()));
+        if (!aluno.getInstituicao().getId().equals(alunoUpdateDTO.getInstituicaoId())) {
+            Instituicao instituicao = instituicaoRepository.findById(alunoUpdateDTO.getInstituicaoId())
+                    .orElseThrow(() -> new RuntimeException("Instituição não encontrada com ID: " + alunoUpdateDTO.getInstituicaoId()));
             aluno.setInstituicao(instituicao);
         }
         
         // Atualizar campos
-        aluno.setNome(alunoDTO.getNome());
-        aluno.setEmail(alunoDTO.getEmail());
-        if (alunoDTO.getSenha() != null && !alunoDTO.getSenha().isEmpty()) {
-            aluno.setSenha(alunoDTO.getSenha()); // TODO: Implementar hash da senha
+        aluno.setNome(alunoUpdateDTO.getNome());
+        aluno.setEmail(alunoUpdateDTO.getEmail());
+        if (alunoUpdateDTO.getSenha() != null && !alunoUpdateDTO.getSenha().isEmpty()) {
+            aluno.setSenha(alunoUpdateDTO.getSenha()); // TODO: Implementar hash da senha
         }
-        aluno.setCpf(alunoDTO.getCpf());
-        aluno.setRg(alunoDTO.getRg());
-        aluno.setEndereco(alunoDTO.getEndereco());
-        aluno.setCurso(alunoDTO.getCurso());
-        if (alunoDTO.getSaldoMoedas() != null) {
-            aluno.setSaldoMoedas(alunoDTO.getSaldoMoedas());
+        aluno.setCpf(alunoUpdateDTO.getCpf());
+        aluno.setRg(alunoUpdateDTO.getRg());
+        aluno.setEndereco(alunoUpdateDTO.getEndereco());
+        aluno.setCurso(alunoUpdateDTO.getCurso());
+        if (alunoUpdateDTO.getSaldoMoedas() != null) {
+            aluno.setSaldoMoedas(alunoUpdateDTO.getSaldoMoedas());
         }
         
         // Salvar

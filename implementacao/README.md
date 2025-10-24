@@ -156,6 +156,17 @@ npm run dev
   - Username: `sa`
   - Password: (deixe em branco)
 
+### **🔑 Credenciais de Acesso**
+
+**Usuário Administrador:**
+- **Email:** `admin@admin.com`
+- **Senha:** `admin123`
+
+**Usuários de Exemplo:**
+- **Aluno:** `joao.silva@aluno.pucminas.br` / `senha123`
+- **Professor:** `carlos.oliveira@pucminas.br` / `prof123`
+- **Empresa:** `contato@techstore.com.br` / `emp123`
+
 ## 🔧 Configuração
 
 ### application.properties
@@ -235,6 +246,9 @@ A aplicação é inicializada com dados de exemplo através da classe `DataIniti
 - ✅ **Tratamento de erros** padronizado
 - ✅ **CORS configurado** para frontend
 - ✅ **Documentação da API** completa
+- ✅ **Autenticação JWT** implementada
+- ✅ **Controle de acesso** por roles (ADMIN)
+- ✅ **Hash de senhas** com BCrypt
 
 ### **Frontend**
 - ✅ **Interface responsiva** com Tailwind CSS
@@ -242,6 +256,9 @@ A aplicação é inicializada com dados de exemplo através da classe `DataIniti
 - ✅ **Componentes reutilizáveis** organizados
 - ✅ **Formulários** com React Hook Form
 - ✅ **Notificações** com React Hot Toast
+- ✅ **Autenticação** com Context API
+- ✅ **Modais** para CRUD operations
+- ✅ **Proteção de rotas** por roles
 
 ### **Banco de Dados**
 - ✅ **H2 em memória** para desenvolvimento
@@ -255,6 +272,9 @@ A aplicação é inicializada com dados de exemplo através da classe `DataIniti
 - **Spring Boot 3.1.5** - Framework principal
 - **Spring Data JPA** - Abstração de acesso a dados
 - **Spring Boot Validation** - Validação de dados
+- **Spring Security** - Autenticação e autorização
+- **JWT (JSON Web Tokens)** - Autenticação stateless
+- **BCrypt** - Hash de senhas
 - **H2 Database** - Banco de dados em memória
 - **Maven** - Gerenciamento de dependências
 - **Java 17** - Linguagem de programação
@@ -290,12 +310,17 @@ O projeto utiliza a estratégia **JOINED** para herança JPA:
 - ✅ Frontend básico com Next.js
 - ✅ Configuração H2 para desenvolvimento
 - ✅ Documentação da API
+- ✅ Autenticação JWT implementada
+- ✅ Controle de acesso por roles (ADMIN)
+- ✅ Hash de senhas com BCrypt
+- ✅ Modais elegantes para CRUD
+- ✅ Notificações com React Hot Toast
 
 ### **Próximas Sprints**
-- 🔄 **Autenticação e Segurança**
-  - Implementar JWT
-  - Hash de senhas com BCrypt
-  - Controle de acesso por roles
+- 🔄 **Autenticação e Segurança** ✅ **CONCLUÍDO**
+  - ✅ Implementar JWT
+  - ✅ Hash de senhas com BCrypt
+  - ✅ Controle de acesso por roles
 - 🔄 **CRUDs Restantes**
   - CRUD Professor
   - CRUD Vantagem
@@ -312,12 +337,12 @@ O projeto utiliza a estratégia **JOINED** para herança JPA:
 ## 🔐 Observações de Segurança
 
 ⚠️ **ATENÇÃO**: Este é um projeto de demonstração. Para uso em produção:
-- Implemente hash de senhas (BCrypt)
-- Adicione autenticação JWT/OAuth2
-- Configure HTTPS
-- Implemente validações de entrada
-- Adicione tratamento de exceções robusto
-- Configure CORS adequadamente
+- ✅ **Hash de senhas (BCrypt)** - Implementado
+- ✅ **Autenticação JWT** - Implementado
+- 🔄 Configure HTTPS
+- ✅ **Validações de entrada** - Implementado com Bean Validation
+- ✅ **Tratamento de exceções** - Implementado
+- ✅ **CORS configurado** - Implementado
 
 ## 📄 Licença
 

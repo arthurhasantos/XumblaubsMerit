@@ -1,6 +1,7 @@
 package com.merito.controller;
 
 import com.merito.dto.EmpresaParceiraDTO;
+import com.merito.dto.EmpresaUpdateDTO;
 import com.merito.service.EmpresaParceiraService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +84,9 @@ public class EmpresaParceiraController {
     
     // PUT /api/empresas/{id} - Atualizar empresa
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizarEmpresa(@PathVariable Long id, @Valid @RequestBody EmpresaParceiraDTO empresaDTO) {
+    public ResponseEntity<?> atualizarEmpresa(@PathVariable Long id, @Valid @RequestBody EmpresaUpdateDTO empresaUpdateDTO) {
         try {
-            EmpresaParceiraDTO empresaAtualizada = empresaParceiraService.atualizarEmpresa(id, empresaDTO);
+            EmpresaParceiraDTO empresaAtualizada = empresaParceiraService.atualizarEmpresa(id, empresaUpdateDTO);
             return ResponseEntity.ok(empresaAtualizada);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
