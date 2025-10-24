@@ -4,6 +4,7 @@ import com.merito.dto.EmpresaParceiraDTO;
 import com.merito.dto.EmpresaUpdateDTO;
 import com.merito.entity.EmpresaParceira;
 import com.merito.repository.EmpresaParceiraRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,9 @@ public class EmpresaParceiraService {
     
     @Autowired
     private EmpresaParceiraRepository empresaParceiraRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     
     // Create
     public EmpresaParceiraDTO criarEmpresaParceira(EmpresaParceiraDTO empresaDTO) {
@@ -34,8 +38,8 @@ public class EmpresaParceiraService {
         // Criar entidade
         EmpresaParceira empresa = new EmpresaParceira();
         empresa.setEmail(empresaDTO.getEmail());
-        empresa.setSenha(empresaDTO.getSenha()); // TODO: Implementar hash da senha
-        empresa.setTipoUsuario("EMPRESA_PARCEIRA");
+        empresa.setSenha(passwordEncoder.encode(empresaDTO.getSenha())); // Hash da senha
+        empresa.setTipoUsuario("EMPRESA");
         empresa.setNome(empresaDTO.getNome());
         empresa.setCnpj(empresaDTO.getCnpj());
         empresa.setEmailContato(empresaDTO.getEmailContato());
@@ -93,7 +97,7 @@ public class EmpresaParceiraService {
         empresa.setNome(empresaUpdateDTO.getNome());
         empresa.setEmail(empresaUpdateDTO.getEmail());
         if (empresaUpdateDTO.getSenha() != null && !empresaUpdateDTO.getSenha().isEmpty()) {
-            empresa.setSenha(empresaUpdateDTO.getSenha()); // TODO: Implementar hash da senha
+            empresa.setSenha(passwordEncoder.encode(empresaUpdateDTO.getSenha())); // Hash da senha
         }
         empresa.setCnpj(empresaUpdateDTO.getCnpj());
         empresa.setEmailContato(empresaUpdateDTO.getEmailContato());
