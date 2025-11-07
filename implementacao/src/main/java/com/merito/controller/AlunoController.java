@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -68,6 +70,29 @@ public class AlunoController {
             return ResponseEntity.ok(aluno.get());
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+    
+    // GET /api/alunos/me - Buscar dados do próprio aluno autenticado
+    @GetMapping("/me")
+    public ResponseEntity<?> buscarMeusDados() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            
+            if (authentication == null || authentication.getName() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado");
+            }
+            
+            String email = authentication.getName();
+            Optional<AlunoDTO> aluno = alunoService.buscarAlunoPorEmail(email);
+            
+            if (aluno.isPresent()) {
+                return ResponseEntity.ok(aluno.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
     

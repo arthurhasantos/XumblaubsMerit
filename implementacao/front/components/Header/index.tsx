@@ -75,6 +75,12 @@ const Header = () => {
                   if (menuItem.requireAdmin) {
                     return user.roles.includes('ADMIN');
                   }
+                  if (menuItem.requireEmpresa) {
+                    return user.roles.includes('EMPRESA');
+                  }
+                  if (menuItem.requireAluno) {
+                    return user.roles.includes('ALUNO');
+                  }
                   return true;
                 })
                 .map((menuItem, index) => (
@@ -168,6 +174,9 @@ const Header = () => {
                     if (!user) return false;
                     if (menuItem.requireAdmin) {
                       return user.roles.includes('ADMIN');
+                    }
+                    if (menuItem.requireEmpresa) {
+                      return user.roles.includes('EMPRESA');
                     }
                     return true;
                   })

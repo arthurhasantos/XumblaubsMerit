@@ -1,13 +1,30 @@
-import { Metadata } from "next";
-import Link from "next/link";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Sistema de Mérito",
-  description: "Sistema de mérito com moedas virtuais para reconhecimento de estudantes",
-  // other metadata
-};
+import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      const role = user.roles?.[0];
+      
+      // Redirecionar usuários logados para suas respectivas áreas
+      if (role === 'EMPRESA') {
+        router.push('/empresa/vantagens');
+      } else if (role === 'ADMIN') {
+        router.push('/admin');
+      } else if (role === 'ALUNO') {
+        router.push('/aluno');
+      } else if (role === 'PROFESSOR') {
+        router.push('/professor');
+      }
+    }
+  }, [user, loading, router]);
   return (
     <>
       {/* Hero Section */}

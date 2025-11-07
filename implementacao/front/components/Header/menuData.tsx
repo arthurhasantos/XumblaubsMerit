@@ -8,5 +8,19 @@ const menuData: Menu[] = [
     newTab: false,
     requireAdmin: true,
   },
+  {
+    id: 6,
+    title: "Gerenciar Vantagens",
+    path: "/empresa/vantagens",
+    newTab: false,
+    requireEmpresa: true,
+  },
+  {
+    id: 7,
+    title: "Meus Resgates",
+    path: "/aluno/resgates",
+    newTab: false,
+    requireAluno: true,
+  },
 ];
 export default menuData;
