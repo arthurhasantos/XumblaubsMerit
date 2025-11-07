@@ -58,6 +58,7 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                 
                 // Endpoints protegidos - apenas ADMIN
+                .requestMatchers(new AntPathRequestMatcher("/api/alunos/me")).authenticated() // Aluno pode buscar seus próprios dados
                 .requestMatchers(new AntPathRequestMatcher("/api/alunos/**")).hasAuthority("ROLE_ADMIN")
                 .requestMatchers(new AntPathRequestMatcher("/api/empresas/**")).hasAuthority("ROLE_ADMIN")
                 .requestMatchers(new AntPathRequestMatcher("/api/instituicoes/**")).hasAuthority("ROLE_ADMIN")

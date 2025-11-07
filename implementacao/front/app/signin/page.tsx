@@ -27,7 +27,29 @@ const SigninPage = () => {
     setIsLoading(true);
     const success = await login(data.email, data.password);
     if (success) {
-      router.push('/clientes');
+      // Aguardar um pouco para o contexto atualizar
+      setTimeout(() => {
+        const savedUser = localStorage.getItem('user');
+        if (savedUser) {
+          const user = JSON.parse(savedUser);
+          const role = user.roles?.[0];
+          
+          // Redirecionar baseado no tipo de usuário
+          if (role === 'EMPRESA') {
+            router.push('/empresa/vantagens');
+          } else if (role === 'ADMIN') {
+            router.push('/admin');
+          } else if (role === 'ALUNO') {
+            router.push('/aluno');
+          } else if (role === 'PROFESSOR') {
+            router.push('/professor');
+          } else {
+            router.push('/clientes');
+          }
+        } else {
+          router.push('/clientes');
+        }
+      }, 100);
     } else {
       toast.error('Email ou senha inválidos');
     }

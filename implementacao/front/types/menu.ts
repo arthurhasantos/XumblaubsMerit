@@ -5,4 +5,6 @@ export type Menu = {
   newTab: boolean;
   submenu?: Menu[];
   requireAdmin?: boolean;
+  requireEmpresa?: boolean;
+  requireAluno?: boolean;
 };
