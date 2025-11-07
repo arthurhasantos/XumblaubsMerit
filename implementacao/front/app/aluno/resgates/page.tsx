@@ -130,16 +130,18 @@ const ResgatesAlunoPage = () => {
               Histórico de vantagens resgatadas
             </p>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-lg shadow-lg">
-              <div className="text-sm font-medium mb-1">Saldo Atual</div>
-              <div className="text-2xl font-bold">{saldoAluno.toFixed(2)} moedas</div>
+          <div className="flex items-stretch space-x-4">
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg shadow-lg flex flex-row items-center justify-between flex-1">
+              <div className="flex flex-col">
+                <div className="text-sm font-medium mb-1">Saldo Atual</div>
+                <div className="text-xl font-bold">{saldoAluno.toFixed(2)} moedas</div>
+              </div>
             </div>
             <button
               onClick={() => router.push('/aluno/vantagens')}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-8 py-3 rounded-lg shadow-lg transition-all duration-300 flex items-center justify-center flex-1"
             >
-              Ver Vantagens
+              <div className="text-xl font-medium">Ver Vantagens</div>
             </button>
           </div>
         </div>

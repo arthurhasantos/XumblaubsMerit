@@ -38,6 +38,8 @@ public class AlunoUpdateDTO {
     
     private Double saldoMoedas = 0.0;
     
+    private String fotoPerfil;
+    
     // Constructors
     public AlunoUpdateDTO() {
     }
@@ -134,5 +136,13 @@ public class AlunoUpdateDTO {
     
     public void setSaldoMoedas(Double saldoMoedas) {
         this.saldoMoedas = saldoMoedas;
+    }
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
     }
 }

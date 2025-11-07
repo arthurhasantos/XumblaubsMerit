@@ -7,6 +7,7 @@ interface User {
   name: string;
   email: string;
   roles: string[];
+  fotoPerfil?: string;
 }
 
 interface AuthContextType {
@@ -15,6 +16,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   token: string | null;
+  updateUser: (userData: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -64,12 +66,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const data = await response.json();
         const { token: accessToken, tipo, email: userEmail, nome } = data;
         
-        const userData: User = {
-          id: 1, // ID fixo para ADMIN
+        let userData: User = {
+          id: 1,
           name: nome || "Administrador",
           email: userEmail,
           roles: [tipo]
         };
+
+        // Se for aluno, buscar dados completos incluindo fotoPerfil
+        if (tipo === 'ALUNO') {
+          try {
+            const alunoResponse = await fetch(`${API_BASE_URL}/api/alunos/me`, {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            if (alunoResponse.ok) {
+              const alunoData = await alunoResponse.json();
+              userData = {
+                id: alunoData.id || 1,
+                name: alunoData.nome || nome || "Aluno",
+                email: alunoData.email || userEmail,
+                roles: [tipo],
+                fotoPerfil: alunoData.fotoPerfil
+              };
+            }
+          } catch (error) {
+            console.error('Erro ao buscar dados do aluno:', error);
+          }
+        }
 
         setToken(accessToken);
         setUser(userData);
@@ -98,12 +125,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('user');
   };
 
+  const updateUser = (userData: Partial<User>): void => {
+    if (user) {
+      const updatedUser = { ...user, ...userData };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+  };
+
   const value: AuthContextType = {
     user,
     loading,
     login,
     logout,
     token,
+    updateUser,
   };
 
   return (

@@ -27,6 +27,9 @@ public class Aluno extends Usuario {
     @Column(nullable = false)
     private Double saldoMoedas = 0.0;
     
+    @Column(length = 500)
+    private String fotoPerfil;
+    
     @ManyToOne
     @JoinColumn(name = "fk_instituicao", nullable = false)
     private Instituicao instituicao;
@@ -114,6 +117,14 @@ public class Aluno extends Usuario {
 
     public void setResgates(List<ResgateVantagem> resgates) {
         this.resgates = resgates;
+    }
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
     }
 }
 

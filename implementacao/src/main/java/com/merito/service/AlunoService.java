@@ -55,6 +55,7 @@ public class AlunoService {
         aluno.setEndereco(alunoDTO.getEndereco());
         aluno.setCurso(alunoDTO.getCurso());
         aluno.setSaldoMoedas(alunoDTO.getSaldoMoedas() != null ? alunoDTO.getSaldoMoedas() : 0.0);
+        aluno.setFotoPerfil(alunoDTO.getFotoPerfil());
         aluno.setInstituicao(instituicao);
         
         // Salvar
@@ -136,6 +137,9 @@ public class AlunoService {
         if (alunoUpdateDTO.getSaldoMoedas() != null) {
             aluno.setSaldoMoedas(alunoUpdateDTO.getSaldoMoedas());
         }
+        if (alunoUpdateDTO.getFotoPerfil() != null) {
+            aluno.setFotoPerfil(alunoUpdateDTO.getFotoPerfil());
+        }
         
         // Salvar
         Aluno alunoAtualizado = alunoRepository.save(aluno);
@@ -163,6 +167,7 @@ public class AlunoService {
         dto.setEndereco(aluno.getEndereco());
         dto.setCurso(aluno.getCurso());
         dto.setSaldoMoedas(aluno.getSaldoMoedas());
+        dto.setFotoPerfil(aluno.getFotoPerfil());
         dto.setInstituicaoId(aluno.getInstituicao().getId());
         return dto;
     }

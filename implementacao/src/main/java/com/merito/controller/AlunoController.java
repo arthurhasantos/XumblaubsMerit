@@ -114,6 +114,31 @@ public class AlunoController {
         return ResponseEntity.ok(alunos);
     }
     
+    // PUT /api/alunos/me - Atualizar próprio perfil
+    @PutMapping("/me")
+    public ResponseEntity<?> atualizarMeuPerfil(@Valid @RequestBody AlunoUpdateDTO alunoUpdateDTO) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            
+            if (authentication == null || authentication.getName() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não autenticado");
+            }
+            
+            String email = authentication.getName();
+            Optional<AlunoDTO> alunoOpt = alunoService.buscarAlunoPorEmail(email);
+            
+            if (alunoOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            Long alunoId = alunoOpt.get().getId();
+            AlunoDTO alunoAtualizado = alunoService.atualizarAluno(alunoId, alunoUpdateDTO);
+            return ResponseEntity.ok(alunoAtualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
+    }
+    
     // PUT /api/alunos/{id} - Atualizar aluno
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizarAluno(@PathVariable Long id, @Valid @RequestBody AlunoUpdateDTO alunoUpdateDTO) {

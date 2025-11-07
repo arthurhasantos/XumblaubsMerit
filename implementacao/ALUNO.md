@@ -2,7 +2,7 @@
 
 ## 👨‍🎓 Aluno Pré-Cadastrado
 
-### João Silva
+### Nelson Jacomil
 
 **Dados de Login:**
 - **Email:** `joao.silva@aluno.pucminas.br`
@@ -10,13 +10,14 @@
 - **Tipo de Usuário:** ALUNO
 
 **Dados Cadastrais:**
-- **Nome:** João Silva
+- **Nome:** Nelson Jacomil
 - **CPF:** 111.222.333-44
 - **RG:** MG-12.345.678
 - **Endereço:** Rua A, 123 - Belo Horizonte
 - **Curso:** Engenharia de Software
-- **Instituição:** PUC Minas
+- **Instituição:** Instituição Padrão
 - **Saldo de Moedas:** 1000.0 moedas
+- **Foto de Perfil:** https://i.imgur.com/8gfVAKh.jpeg
 
 ---
 
@@ -33,6 +34,7 @@
 **Páginas disponíveis:**
 - **Vantagens Disponíveis:** http://localhost:3000/aluno/vantagens
 - **Meus Resgates:** http://localhost:3000/aluno/resgates
+- **Meu Perfil:** http://localhost:3000/aluno/perfil
 
 ### 2. Via API
 
@@ -57,6 +59,7 @@ Após fazer login como aluno, você pode:
 - ✅ **Expandir Imagens** - Clicar nas imagens para vê-las em tamanho maior
 - ✅ **Resgatar Vantagens** - Resgatar vantagens usando suas moedas
 - ✅ **Ver Meus Resgates** - Visualizar histórico de vantagens resgatadas com códigos de cupom
+- ✅ **Editar Perfil** - Editar dados pessoais e adicionar foto de perfil
 
 ---
 
@@ -102,7 +105,10 @@ Authorization: Bearer {token}
 ## 📊 Informações do Aluno
 
 ### Saldo de Moedas
-O aluno **João Silva** possui **1000.0 moedas** disponíveis para resgatar vantagens.
+O aluno **Nelson Jacomil** possui **1000.0 moedas** disponíveis para resgatar vantagens.
+
+### Foto de Perfil
+O aluno possui uma foto de perfil cadastrada que será exibida no header da aplicação ao fazer login.
 
 ### Vantagens Disponíveis
 O sistema lista todas as vantagens cadastradas pelas empresas parceiras, mostrando:
@@ -114,15 +120,12 @@ O sistema lista todas as vantagens cadastradas pelas empresas parceiras, mostran
 
 ---
 
-## 🔄 Outros Alunos Cadastrados
+## 🔄 Funcionalidades de Perfil
 
-O sistema também possui outro aluno de exemplo:
-
-**Maria Santos**
-- Email: `maria.santos@aluno.pucminas.br`
-- Senha: `senha456`
-- Curso: Ciência da Computação
-- Saldo: 500.0 moedas
+O aluno pode:
+- ✅ **Editar Perfil** - Acessar "Meu Perfil" no menu para editar dados pessoais
+- ✅ **Adicionar Foto** - Inserir URL de imagem de perfil (recomendado: Imgur com link direto)
+- ✅ **Visualizar Foto** - A foto aparece em miniatura no header junto com o nome
 
 ---
 

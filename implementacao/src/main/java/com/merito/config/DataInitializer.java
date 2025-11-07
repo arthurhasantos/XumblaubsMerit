@@ -40,12 +40,13 @@ public class DataInitializer {
             aluno.setEmail("joao.silva@aluno.pucminas.br");
             aluno.setSenha(passwordEncoder.encode("senha123"));
             aluno.setTipoUsuario("ALUNO");
-            aluno.setNome("João Silva");
+            aluno.setNome("Nelson Jacomil");
             aluno.setCpf("111.222.333-44");
             aluno.setRg("MG-12.345.678");
             aluno.setEndereco("Rua A, 123 - Belo Horizonte");
             aluno.setCurso("Engenharia de Software");
             aluno.setSaldoMoedas(1000.0);
+            aluno.setFotoPerfil("https://i.imgur.com/8gfVAKh.jpeg");
             aluno.setInstituicao(instituicaoPadrao);
             alunoRepository.save(aluno);
 

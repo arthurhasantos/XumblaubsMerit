@@ -15,12 +15,5 @@ const menuData: Menu[] = [
     newTab: false,
     requireEmpresa: true,
   },
-  {
-    id: 7,
-    title: "Meus Resgates",
-    path: "/aluno/resgates",
-    newTab: false,
-    requireAluno: true,
-  },
 ];
 export default menuData;
