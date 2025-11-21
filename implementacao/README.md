@@ -108,6 +108,11 @@ SELECT * FROM usuario;
 ### Professor (Exemplo)
 - **Email:** `carlos.oliveira@pucminas.br`
 - **Senha:** `prof123`
+- **Nome:** Carlos Oliveira
+- **CPF:** 123.456.789-00
+- **Departamento:** Ciência da Computação
+- **Saldo Inicial:** 1000.0 moedas (crédito inicial do sistema)
+- **Instituição:** Instituição Padrão (mesma do aluno)
 
 ### Empresa (Exemplo)
 - **Email:** `empresa@teste.com`
@@ -120,6 +125,7 @@ SELECT * FROM usuario;
 - **Frontend:** http://localhost:3000
 - **Backend API:** http://localhost:8080/api
 - **H2 Console:** http://localhost:8080/h2-console
+- **Página do Professor:** http://localhost:3000/professor
 - **Página de Vantagens (Empresa):** http://localhost:3000/empresa/vantagens
 - **Página de Vantagens (Aluno):** http://localhost:3000/aluno/vantagens
 - **Página de Resgates (Aluno):** http://localhost:3000/aluno/resgates

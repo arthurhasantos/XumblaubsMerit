@@ -35,7 +35,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Iniciar como true para aguardar verificação do localStorage
   const [token, setToken] = useState<string | null>(null);
 
   // Verificar se há token salvo no localStorage ao carregar
@@ -47,6 +47,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setToken(savedToken);
       setUser(JSON.parse(savedUser));
     }
+    
+    // Marcar como carregado após verificar o localStorage
+    setLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {

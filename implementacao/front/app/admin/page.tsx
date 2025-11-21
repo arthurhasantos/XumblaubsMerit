@@ -37,7 +37,7 @@ const AdminPage = () => {
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-800 flex flex-col">
               <div className="flex items-center mb-4">
                 <div className="bg-blue-100 dark:bg-blue-800 p-3 rounded-lg">
                   <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,7 +48,7 @@ const AdminPage = () => {
                   CRUD Alunos
                 </h3>
               </div>
-              <p className="text-blue-700 dark:text-blue-300 text-sm mb-4">
+              <p className="text-blue-700 dark:text-blue-300 text-sm mb-4 flex-grow">
                 Gerencie os dados dos alunos do sistema, incluindo informações pessoais, cursos e saldo de moedas.
               </p>
               <button
@@ -59,7 +59,7 @@ const AdminPage = () => {
               </button>
             </div>
             
-            <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200 dark:border-green-800">
+            <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200 dark:border-green-800 flex flex-col">
               <div className="flex items-center mb-4">
                 <div className="bg-green-100 dark:bg-green-800 p-3 rounded-lg">
                   <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -70,7 +70,7 @@ const AdminPage = () => {
                   CRUD Empresas
                 </h3>
               </div>
-              <p className="text-green-700 dark:text-green-300 text-sm mb-4">
+              <p className="text-green-700 dark:text-green-300 text-sm mb-4 flex-grow">
                 Gerencie as empresas parceiras que oferecem vantagens e benefícios para os alunos.
               </p>
               <button

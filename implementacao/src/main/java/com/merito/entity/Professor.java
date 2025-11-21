@@ -16,7 +16,7 @@ public class Professor extends Usuario {
     private String departamento;
     
     @Column(nullable = false)
-    private Double saldoMoedas = 0.0;
+    private Double saldoMoedas = 1000.0; // Saldo inicial padrão de 1000 moedas
     
     @ManyToOne
     @JoinColumn(name = "fk_instituicao", nullable = false)

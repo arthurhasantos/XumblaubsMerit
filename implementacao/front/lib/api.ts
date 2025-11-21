@@ -76,10 +76,36 @@ export const api = {
     if (!response.ok) {
       const errorText = await response.text();
       console.log('Error response:', errorText);
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // Tentar parsear como JSON, se falhar usar o texto
+      try {
+        const errorJson = JSON.parse(errorText);
+        throw new Error(errorJson.message || errorJson.error || errorText);
+      } catch {
+        throw new Error(errorText || `HTTP error! status: ${response.status}`);
+      }
     }
     
-    return response.json();
+    // Verificar se a resposta tem conteúdo antes de tentar parsear JSON
+    const contentType = response.headers.get('content-type');
+    const text = await response.text();
+    
+    if (!text || text.trim().length === 0) {
+      return null;
+    }
+    
+    // Se o content-type indica JSON ou se o texto começa com { ou [, tentar parsear como JSON
+    if (contentType && contentType.includes('application/json') || 
+        (text.trim().startsWith('{') || text.trim().startsWith('['))) {
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        // Se falhar, retornar o texto como objeto
+        return { message: text };
+      }
+    }
+    
+    // Se não for JSON, retornar como objeto com a mensagem
+    return { message: text };
   },
 
   put: async (url: string, data: any) => {

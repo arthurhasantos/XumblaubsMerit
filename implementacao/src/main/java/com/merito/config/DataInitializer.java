@@ -19,51 +19,88 @@ public class DataInitializer {
             InstituicaoRepository instituicaoRepository,
             AlunoRepository alunoRepository,
             EmpresaParceiraRepository empresaRepository,
-            UsuarioRepository usuarioRepository) {
+            ProfessorRepository professorRepository,
+            UsuarioRepository usuarioRepository,
+            com.merito.repository.TransacaoMoedaRepository transacaoMoedaRepository) {
         
         return args -> {
-            // Criar usuário ADMIN padrão
-            Usuario admin = new Usuario();
-            admin.setEmail("admin@admin.com");
-            admin.setSenha(passwordEncoder.encode("admin123"));
-            admin.setTipoUsuario("ADMIN");
-            usuarioRepository.save(admin);
+            // Criar usuário ADMIN padrão (se não existir)
+            if (!usuarioRepository.findByEmail("admin@admin.com").isPresent()) {
+                Usuario admin = new Usuario();
+                admin.setEmail("admin@admin.com");
+                admin.setSenha(passwordEncoder.encode("admin123"));
+                admin.setTipoUsuario("ADMIN");
+                usuarioRepository.save(admin);
+            }
 
-            // Criar Instituição mínima (necessária para o aluno)
-            Instituicao instituicaoPadrao = new Instituicao();
-            instituicaoPadrao.setNome("Instituição Padrão");
-            instituicaoPadrao.setEndereco("Endereço padrão");
-            instituicaoRepository.save(instituicaoPadrao);
+            // Criar Instituição mínima (necessária para o aluno e professor)
+            Instituicao instituicaoPadrao = instituicaoRepository.findAll().stream()
+                    .findFirst()
+                    .orElseGet(() -> {
+                        Instituicao inst = new Instituicao();
+                        inst.setNome("Instituição Padrão");
+                        inst.setEndereco("Endereço padrão");
+                        return instituicaoRepository.save(inst);
+                    });
 
-            // Criar Aluno
-            Aluno aluno = new Aluno();
-            aluno.setEmail("joao.silva@aluno.pucminas.br");
-            aluno.setSenha(passwordEncoder.encode("senha123"));
-            aluno.setTipoUsuario("ALUNO");
-            aluno.setNome("João Silva");
-            aluno.setCpf("111.222.333-44");
-            aluno.setRg("MG-12.345.678");
-            aluno.setEndereco("Rua A, 123 - Belo Horizonte");
-            aluno.setCurso("Engenharia de Software");
-            aluno.setSaldoMoedas(1000.0);
-            aluno.setInstituicao(instituicaoPadrao);
-            alunoRepository.save(aluno);
+            // Criar Aluno (se não existir)
+            if (!alunoRepository.findByEmail("joao.silva@aluno.pucminas.br").isPresent()) {
+                Aluno aluno = new Aluno();
+                aluno.setEmail("joao.silva@aluno.pucminas.br");
+                aluno.setSenha(passwordEncoder.encode("senha123"));
+                aluno.setTipoUsuario("ALUNO");
+                aluno.setNome("João Silva");
+                aluno.setCpf("111.222.333-44");
+                aluno.setRg("MG-12.345.678");
+                aluno.setEndereco("Rua A, 123 - Belo Horizonte");
+                aluno.setCurso("Engenharia de Software");
+                aluno.setSaldoMoedas(1000.0);
+                aluno.setInstituicao(instituicaoPadrao);
+                alunoRepository.save(aluno);
+            }
 
-            // Criar Empresa Parceira
-            EmpresaParceira empresa = new EmpresaParceira();
-            empresa.setEmail("empresa@teste.com");
-            empresa.setSenha(passwordEncoder.encode("empresa123"));
-            empresa.setTipoUsuario("EMPRESA");
-            empresa.setNome("Empresa Teste Parceira");
-            empresa.setCnpj("11.222.333/0001-44");
-            empresa.setEmailContato("contato@empresateste.com");
-            empresaRepository.save(empresa);
+            // Criar Empresa Parceira (se não existir)
+            if (!empresaRepository.findByEmail("empresa@teste.com").isPresent()) {
+                EmpresaParceira empresa = new EmpresaParceira();
+                empresa.setEmail("empresa@teste.com");
+                empresa.setSenha(passwordEncoder.encode("empresa123"));
+                empresa.setTipoUsuario("EMPRESA");
+                empresa.setNome("Empresa Teste Parceira");
+                empresa.setCnpj("11.222.333/0001-44");
+                empresa.setEmailContato("contato@empresateste.com");
+                empresaRepository.save(empresa);
+            }
+
+            // Criar Professor (se não existir)
+            if (!professorRepository.findByEmail("carlos.oliveira@pucminas.br").isPresent()) {
+                Professor professor = new Professor();
+                professor.setEmail("carlos.oliveira@pucminas.br");
+                professor.setSenha(passwordEncoder.encode("prof123"));
+                professor.setTipoUsuario("PROFESSOR");
+                professor.setNome("Carlos Oliveira");
+                professor.setCpf("123.456.789-00");
+                professor.setDepartamento("Ciência da Computação");
+                professor.setSaldoMoedas(1000.0); // Saldo inicial de 1000 moedas
+                professor.setInstituicao(instituicaoPadrao);
+                Professor professorSalvo = professorRepository.save(professor);
+                
+                // Registrar crédito inicial no histórico
+                com.merito.entity.TransacaoMoeda transacaoInicial = new com.merito.entity.TransacaoMoeda();
+                transacaoInicial.setDataTransacao(java.time.LocalDateTime.now());
+                transacaoInicial.setQuantidade(1000.0);
+                transacaoInicial.setTipo("RECEBIDA");
+                transacaoInicial.setMotivo("Crédito inicial do sistema");
+                transacaoInicial.setProfessor(professorSalvo);
+                transacaoInicial.setAluno(null); // Não há aluno envolvido
+                transacaoMoedaRepository.save(transacaoInicial);
+            }
 
             System.out.println("========================================");
             System.out.println("✓ Banco de dados inicializado!");
             System.out.println("✓ Usuários criados:");
             System.out.println("  - ADMIN: admin@admin.com / admin123");
             System.out.println("  - ALUNO: joao.silva@aluno.pucminas.br / senha123");
+            System.out.println("  - PROFESSOR: carlos.oliveira@pucminas.br / prof123");
             System.out.println("  - EMPRESA: empresa@teste.com / empresa123");
             System.out.println("✓ Acesse o H2 Console em: http://localhost:8080/h2-console");
             System.out.println("✓ JDBC URL: jdbc:h2:mem:meritodb");

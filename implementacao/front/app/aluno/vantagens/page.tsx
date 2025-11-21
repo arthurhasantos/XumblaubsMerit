@@ -151,6 +151,12 @@ const VantagensAlunoPage = () => {
               <div className="text-2xl font-bold">{saldoAluno.toFixed(2)} moedas</div>
             </div>
             <button
+              onClick={() => router.push('/aluno/moedas')}
+              className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Histórico de Moedas
+            </button>
+            <button
               onClick={() => router.push('/aluno/resgates')}
               className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
             >
