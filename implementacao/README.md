@@ -103,6 +103,10 @@ SELECT * FROM usuario;
 - **Email:** `joao.silva@aluno.pucminas.br`
 - **Senha:** `senha123`
 
+### Aluno 2 
+- **Email:** `victorferreiralmeida@gmail.com`
+- **Senha:** `senha123`
+
 > 📋 **Dados completos do aluno:** Veja o arquivo [ALUNO.md](./ALUNO.md)
 
 ### Professor (Exemplo)
@@ -114,8 +118,16 @@ SELECT * FROM usuario;
 - **Saldo Inicial:** 1000.0 moedas (crédito inicial do sistema)
 - **Instituição:** Instituição Padrão (mesma do aluno)
 
+### Professor 2 (Exemplo)
+- **Email:** `arthurhsantos2018@gmail.com`
+- **Senha:** `prof123`
+
 ### Empresa (Exemplo)
 - **Email:** `empresa@teste.com`
+- **Senha:** `empresa123`
+
+### Empresa 2 (Exemplo)
+- **Email:** `lucas.jacome66@gmail.com`
 - **Senha:** `empresa123`
 
 > 📋 **Dados completos da empresa parceira:** Veja o arquivo [EMPRESA_PARCEIRA.md](./EMPRESA_PARCEIRA.md)

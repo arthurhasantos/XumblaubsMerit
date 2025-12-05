@@ -30,6 +30,9 @@ public class ResgateVantagemService {
     @Autowired
     private VantagemRepository vantagemRepository;
     
+    @Autowired
+    private EmailService emailService;
+    
     // Criar resgate de vantagem
     public ResgateVantagemDTO resgatarVantagem(Long vantagemId, Long alunoId) {
         // Buscar aluno
@@ -64,8 +67,32 @@ public class ResgateVantagemService {
         // Salvar resgate
         ResgateVantagem resgateSalvo = resgateRepository.save(resgate);
         
-        // Retornar DTO
-        return converterParaDTO(resgateSalvo);
+        // Retornar DTO imediatamente (sem esperar e-mail)
+        ResgateVantagemDTO dto = converterParaDTO(resgateSalvo);
+        
+        // Enviar e-mails de notificação em background (assíncrono)
+        // Isso não bloqueia a resposta HTTP
+        System.out.println("📧 Iniciando envio de e-mails para resgate de vantagem (em background)...");
+        System.out.println("   Aluno: " + aluno.getEmail());
+        System.out.println("   Empresa: " + vantagem.getEmpresa().getEmailContato());
+        
+        // Executar envio de e-mail em thread separada para não bloquear
+        new Thread(() -> {
+            try {
+                // E-mail para o aluno com o código do cupom
+                emailService.enviarEmailCupomAluno(aluno, vantagem, codigoCupom);
+                
+                // E-mail para a empresa parceira
+                emailService.enviarEmailCupomEmpresa(vantagem.getEmpresa(), aluno, vantagem, codigoCupom);
+                System.out.println("✓ Processo de envio de e-mails concluído");
+            } catch (Exception e) {
+                // Log do erro, mas não interrompe o fluxo
+                System.err.println("❌ Erro ao enviar e-mails de notificação: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
+        
+        return dto;
     }
     
     // Gerar código de cupom único

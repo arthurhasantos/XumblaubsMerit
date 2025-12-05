@@ -25,6 +25,9 @@ public class ProfessorService {
     @Autowired
     private TransacaoMoedaService transacaoMoedaService;
     
+    @Autowired
+    private EmailService emailService;
+    
     // Buscar professor por email
     public Optional<ProfessorDTO> buscarProfessorPorEmail(String email) {
         return professorRepository.findByEmail(email)
@@ -83,6 +86,38 @@ public class ProfessorService {
             transferenciaDTO.getQuantidade(), 
             transferenciaDTO.getMotivo()
         );
+        
+        // Enviar e-mails de notificação em background (assíncrono)
+        System.out.println("📧 Enviando e-mails de notificação (em background)...");
+        System.out.println("   Aluno: " + aluno.getEmail());
+        System.out.println("   Professor: " + professor.getEmail());
+        
+        new Thread(() -> {
+            try {
+                // E-mail para o aluno (notificação de moedas recebidas)
+                emailService.enviarEmailMoedasRecebidas(
+                    aluno, 
+                    professor, 
+                    transferenciaDTO.getQuantidade(), 
+                    transferenciaDTO.getMotivo()
+                );
+                
+                // E-mail para o professor (confirmação de envio)
+                emailService.enviarEmailConfirmacaoEnvioMoedas(
+                    professor,
+                    aluno,
+                    transferenciaDTO.getQuantidade(),
+                    transferenciaDTO.getMotivo(),
+                    novoSaldoProfessor
+                );
+                
+                System.out.println("✓ Processo de envio de e-mails concluído");
+            } catch (Exception e) {
+                // Log do erro, mas não interrompe o fluxo
+                System.err.println("❌ Erro ao enviar e-mails de notificação: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
     }
     
     // Método auxiliar para converter entidade para DTO
