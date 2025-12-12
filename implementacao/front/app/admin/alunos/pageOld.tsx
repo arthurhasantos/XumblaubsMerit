@@ -1,167 +1,70 @@
-"use client"
+"use client";
 
-import { useAuth } from "@/contexts/AuthContext"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { ProtectedRoute } from "@/components/Auth/ProtectedRoute"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import api from "@/services/api"
-import toast from "react-hot-toast"
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
+import toast from "react-hot-toast";
 
-interface Aluno {
-  id: number
-  nome: string
-  email: string
-  cpf: string
-  rg: string
-  endereco: string
-  curso: string
-  saldoMoedas: number
-  instituicaoId: number
-}
-
-interface AlunoFormData {
-  nome: string
-  email: string
-  senha: string
-  cpf: string
-  rg: string
-  endereco: string
-  curso: string
-  saldoMoedas: number
-  instituicaoId: number
-}
-
-/**
- * Página de gerenciamento de alunos (CRUD completo).
- * Utiliza React Query para gerenciar estado, cache e sincronização com a API.
- * 
- * @returns {JSX.Element} Componente da página de alunos
- */
 const AlunosPage = () => {
-  const { user } = useAuth()
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  
-  const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState<'add' | 'edit' | 'delete'>('add')
-  const [selectedAluno, setSelectedAluno] = useState<Aluno | null>(null)
-  const [formData, setFormData] = useState<AlunoFormData>({
+  const { user, token } = useAuth();
+  const router = useRouter();
+  const [alunos, setAlunos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('add'); // 'add', 'edit', 'delete'
+  const [selectedAluno, setSelectedAluno] = useState(null);
+  const [formData, setFormData] = useState({
     nome: '',
     email: '',
-    senha: 'senha123',
+    senha: 'senha123', // Senha padrão
     cpf: '',
     rg: '',
     endereco: '',
     curso: '',
     saldoMoedas: 0,
-    instituicaoId: 1
-  })
+    instituicaoId: 1 // ID fixo da primeira instituição (PUC Minas)
+  });
 
-  /**
-   * Query para buscar lista de alunos da API.
-   * Executa automaticamente quando o componente monta e o usuário é ADMIN.
-   * Gerencia cache, loading e refetch automático.
-   * 
-   * @returns {Aluno[]} Lista de alunos cadastrados
-   */
-  const { data: alunos = [], isLoading } = useQuery<Aluno[]>({
-    queryKey: ['alunos'],
-    queryFn: async () => {
-      return await api.get('/alunos')
-    },
-    enabled: !!user && user.roles.includes('ADMIN'),
-  })
+  useEffect(() => {
+    if (user && user.roles.includes('ADMIN')) {
+      fetchAlunos();
+    }
+  }, [user, token]);
 
-  /**
-   * Mutation para adicionar ou editar um aluno.
-   * Invalida o cache de alunos após sucesso, forçando refetch.
-   * 
-   * @param {Object} data - Dados da operação
-   * @param {boolean} data.isEdit - Se true, atualiza; se false, cria novo
-   * @param {number} [data.alunoId] - ID do aluno (obrigatório quando isEdit=true)
-   * @param {AlunoFormData} data.formData - Dados do formulário do aluno
-   * @returns {Promise<void>}
-   */
-  const saveMutation = useMutation({
-    mutationFn: async (data: { isEdit: boolean; alunoId?: number; formData: AlunoFormData }) => {
-      if (data.isEdit && data.alunoId) {
-        return await api.put(`/alunos/${data.alunoId}`, data.formData)
+  const fetchAlunos = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/alunos', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAlunos(data);
       } else {
-        return await api.post('/alunos', data.formData)
+        console.error('Erro ao buscar alunos:', response.statusText);
       }
-    },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['alunos'] })
-      closeModal()
-      toast.success(
-        `Aluno ${variables.isEdit ? 'atualizado' : 'adicionado'} com sucesso!`,
-        { duration: 3000, position: 'top-right' }
-      )
-    },
-    onError: (error, variables) => {
-      console.error('Erro ao salvar aluno:', error)
-      toast.error(
-        `Erro ao ${variables.isEdit ? 'atualizar' : 'adicionar'} aluno`,
-        { duration: 4000, position: 'top-right' }
-      )
+    } catch (error) {
+      console.error('Erro ao buscar alunos:', error);
+    } finally {
+      setLoading(false);
     }
-  })
+  };
 
-  /**
-   * Mutation para deletar um aluno.
-   * Invalida o cache de alunos após sucesso.
-   * 
-   * @param {number} alunoId - ID do aluno a ser deletado
-   * @returns {Promise<void>}
-   */
-  const deleteMutation = useMutation({
-    mutationFn: async (alunoId: number) => {
-      return await api.delete(`/alunos/${alunoId}`)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['alunos'] })
-      closeModal()
-      toast.success('Aluno excluído com sucesso!', {
-        duration: 3000,
-        position: 'top-right'
-      })
-    },
-    onError: (error) => {
-      console.error('Erro ao excluir aluno:', error)
-      toast.error('Erro ao excluir aluno', {
-        duration: 4000,
-        position: 'top-right'
-      })
-    }
-  })
-
-  /**
-   * Atualiza o estado do formulário quando campos são alterados.
-   * Converte automaticamente o valor de 'saldoMoedas' para número.
-   * 
-   * @param {React.ChangeEvent<HTMLInputElement>} e - Evento de mudança do input
-   * @returns {void}
-   */
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'saldoMoedas' ? Number(value) : value
-    }))
-  }
+      [name]: value
+    }));
+  };
 
-  /**
-   * Abre o modal em um dos três modos: add, edit ou delete.
-   * Inicializa o formulário com dados vazios (add) ou do aluno selecionado (edit).
-   * 
-   * @param {'add' | 'edit' | 'delete'} type - Tipo de operação do modal
-   * @param {Aluno | null} [aluno=null] - Aluno a ser editado/deletado (opcional)
-   * @returns {void}
-   */
-  const openModal = (type: 'add' | 'edit' | 'delete', aluno: Aluno | null = null) => {
-    setModalType(type)
-    setSelectedAluno(aluno)
+  const openModal = (type, aluno = null) => {
+    setModalType(type);
+    setSelectedAluno(aluno);
     
     if (type === 'add') {
       setFormData({
@@ -174,71 +77,111 @@ const AlunosPage = () => {
         curso: '',
         saldoMoedas: 0,
         instituicaoId: 1
-      })
+      });
     } else if (type === 'edit' && aluno) {
       setFormData({
         nome: aluno.nome || '',
         email: aluno.email || '',
-        senha: 'senha123',
+        senha: 'senha123', // Senha padrão para edição
         cpf: aluno.cpf || '',
         rg: aluno.rg || '',
         endereco: aluno.endereco || '',
         curso: aluno.curso || '',
         saldoMoedas: aluno.saldoMoedas || 0,
         instituicaoId: aluno.instituicaoId || 1
-      })
+      });
     }
     
-    setShowModal(true)
-  }
+    setShowModal(true);
+  };
 
-  /**
-   * Fecha o modal e limpa o estado do aluno selecionado.
-   * 
-   * @returns {void}
-   */
   const closeModal = () => {
-    setShowModal(false)
-    setSelectedAluno(null)
-  }
+    setShowModal(false);
+    setSelectedAluno(null);
+  };
 
-  /**
-   * Manipula o submit do formulário de adicionar/editar aluno.
-   * Previne comportamento padrão e dispara a mutation apropriada.
-   * 
-   * @param {React.FormEvent} e - Evento de submit do formulário
-   * @returns {Promise<void>}
-   */
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const url = modalType === 'add' 
+        ? 'http://localhost:8080/api/alunos'
+        : `http://localhost:8080/api/alunos/${selectedAluno.id}`;
+      
+              const method = modalType === 'add' ? 'POST' : 'PUT';
+              
+              const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+              });
 
-    await saveMutation.mutateAsync({
-      isEdit: modalType === 'edit',
-      alunoId: selectedAluno?.id,
-      formData
-    })
-  }
-
-  /**
-   * Manipula a exclusão do aluno selecionado.
-   * Dispara a mutation de delete apenas se houver um aluno selecionado.
-   * 
-   * @returns {Promise<void>}
-   */
-  const handleDelete = async () => {
-    if (selectedAluno) {
-      await deleteMutation.mutateAsync(selectedAluno.id)
+              if (response.ok) {
+                closeModal();
+                fetchAlunos();
+                toast.success(`Aluno ${modalType === 'add' ? 'adicionado' : 'atualizado'} com sucesso!`, {
+                  duration: 3000,
+                  position: 'top-right',
+                });
+              } else {
+                const errorText = await response.text();
+                console.error('Erro response:', errorText);
+                toast.error(`Erro ao ${modalType === 'add' ? 'adicionar' : 'atualizar'} aluno: ${response.status}`, {
+                  duration: 4000,
+                  position: 'top-right',
+                });
+              }
+    } catch (error) {
+      console.error('Erro ao salvar aluno:', error);
+      toast.error(`Erro ao ${modalType === 'add' ? 'adicionar' : 'atualizar'} aluno`, {
+        duration: 4000,
+        position: 'top-right',
+      });
     }
-  }
+  };
 
-  if (isLoading) {
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/alunos/${selectedAluno.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        closeModal();
+        fetchAlunos();
+        toast.success('Aluno excluído com sucesso!', {
+          duration: 3000,
+          position: 'top-right',
+        });
+      } else {
+        toast.error('Erro ao excluir aluno', {
+          duration: 4000,
+          position: 'top-right',
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao excluir aluno:', error);
+      toast.error('Erro ao excluir aluno', {
+        duration: 4000,
+        position: 'top-right',
+      });
+    }
+  };
+
+  if (loading) {
     return (
       <div className="container mx-auto px-4 py-8 pt-24">
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -382,17 +325,15 @@ const AlunosPage = () => {
                     <div className="flex justify-center space-x-3">
                       <button
                         onClick={closeModal}
-                        disabled={deleteMutation.isPending}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                       >
                         Cancelar
                       </button>
                       <button
                         onClick={handleDelete}
-                        disabled={deleteMutation.isPending}
-                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50"
+                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
                       >
-                        {deleteMutation.isPending ? 'Excluindo...' : 'Excluir'}
+                        Excluir
                       </button>
                     </div>
                   </div>
@@ -511,20 +452,15 @@ const AlunosPage = () => {
                       <button
                         type="button"
                         onClick={closeModal}
-                        disabled={saveMutation.isPending}
-                        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
+                        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                       >
                         Cancelar
                       </button>
                       <button
                         type="submit"
-                        disabled={saveMutation.isPending}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
                       >
-                        {saveMutation.isPending 
-                          ? 'Salvando...' 
-                          : modalType === 'add' ? 'Adicionar' : 'Salvar'
-                        }
+                        {modalType === 'add' ? 'Adicionar' : 'Salvar'}
                       </button>
                     </div>
                   </form>
@@ -535,7 +471,7 @@ const AlunosPage = () => {
         )}
       </div>
     </ProtectedRoute>
-  )
-}
+  );
+};
 
-export default AlunosPage
+export default AlunosPage;
