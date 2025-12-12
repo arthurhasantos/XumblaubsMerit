@@ -1,17 +1,17 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
+import { useAuth } from "@/contexts/AuthContext"
+import { useRouter } from "next/navigation"
+import { ProtectedRoute } from "@/components/Auth/ProtectedRoute"
 
 const AdminPage = () => {
-  const { user, logout } = useAuth();
-  const router = useRouter();
+  const { user, logout } = useAuth()
+  const router = useRouter()
 
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
+  const handleLogout = async () => {
+    await logout()
+    router.push('/')
+  }
 
   return (
     <ProtectedRoute requireAdmin={true}>
@@ -85,7 +85,7 @@ const AdminPage = () => {
         </div>
       </div>
     </ProtectedRoute>
-  );
-};
+  )
+}
 
-export default AdminPage;
+export default AdminPage

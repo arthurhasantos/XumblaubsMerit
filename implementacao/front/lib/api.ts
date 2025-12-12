@@ -1,145 +1,73 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 
-// Helper function to get auth token
-const getAuthToken = (): string | null => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('authToken');
-    console.log('Token encontrado:', token ? 'Sim' : 'Não');
-    return token;
-  }
-  return null;
-};
+/** * Trata a resposta HTTP de forma consistente, verificando status e convertendo o conteúdo. 
+ * @param {Response} response - Resposta da requisição fetch 
+ * @returns {Promise<any>} - Dados convertidos ou erro tratado 
+ */
+const handleResponse = async (response: Response): Promise<any> => {
+  const isJson = response.headers.get("content-type")?.includes("application/json")
 
-// Helper function to get headers with auth token
-const getHeaders = (): HeadersInit => {
-  const token = getAuthToken();
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
-  
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-    console.log('Headers com token:', headers);
+  const data = !isJson
+      ? await response.text().catch(() => null)
+      : await response.json().catch(() => null)
+
+
+  if (!response.ok) {
+    throw new Error(!isJson ? data : data?.message)
   } else {
-    console.log('Nenhum token encontrado');
+    return data
   }
-  
-  return headers;
-};
+}
 
-// Simple API utility using fetch
-export const api = {
-  get: async (url: string) => {
-    const fullUrl = `${API_BASE_URL}/api${url}`;
-    console.log('🌐 GET request para:', fullUrl);
-    console.log('🔧 API_BASE_URL:', API_BASE_URL);
-    
-    const headers = getHeaders();
-    console.log('📋 Headers sendo enviados:', headers);
-    
-    const response = await fetch(fullUrl, {
-      method: 'GET',
-      headers: headers,
-    });
-    
-    console.log('📡 Response status:', response.status);
-    console.log('📡 Response ok:', response.ok);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('❌ Error response:', errorText);
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    console.log('✅ Response data:', data);
-    return data;
-  },
+/**
+ * Função global de request baseada em fetch para padronizar chamadas.
+ * - Envia cookies automaticamente
+ * - Aplica headers padrão
+ *
+ * @param {string} endpoint - Caminho da rota da API
+ * @param {RequestInit} options - Opções da requisição
+ * @returns {Promise<any>} - Dados convertidos via handleResponse()
+ */
+const request = async (endpoint: string, options: RequestInit): Promise<any> => {
+  const response = await fetch(`${API_BASE_URL}/api${endpoint}`, {
+    ...options,
+    credentials: "include", 
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  })
 
-  post: async (url: string, data: any) => {
-    const fullUrl = `${API_BASE_URL}/api${url}`;
-    console.log('POST request para:', fullUrl);
-    console.log('Dados enviados:', data);
-    
-    const headers = getHeaders();
-    console.log('Headers sendo enviados:', headers);
-    
-    const response = await fetch(fullUrl, {
-      method: 'POST',
-      headers: headers,
+  return handleResponse(response)
+}
+
+const api = {
+  post: (endpoint: string, data?: any) =>
+    request(endpoint, 
+    {
+      method: "POST",
       body: JSON.stringify(data),
-    });
-    
-    console.log('Response status:', response.status);
-    console.log('Response headers:', response.headers);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log('Error response:', errorText);
-      // Tentar parsear como JSON, se falhar usar o texto
-      try {
-        const errorJson = JSON.parse(errorText);
-        throw new Error(errorJson.message || errorJson.error || errorText);
-      } catch {
-        throw new Error(errorText || `HTTP error! status: ${response.status}`);
-      }
     }
-    
-    // Verificar se a resposta tem conteúdo antes de tentar parsear JSON
-    const contentType = response.headers.get('content-type');
-    const text = await response.text();
-    
-    if (!text || text.trim().length === 0) {
-      return null;
+  ),
+  get: (endpoint: string) => 
+    request(endpoint, 
+    { 
+      method: "GET" 
     }
-    
-    // Se o content-type indica JSON ou se o texto começa com { ou [, tentar parsear como JSON
-    if (contentType && contentType.includes('application/json') || 
-        (text.trim().startsWith('{') || text.trim().startsWith('['))) {
-      try {
-        return JSON.parse(text);
-      } catch (e) {
-        // Se falhar, retornar o texto como objeto
-        return { message: text };
-      }
-    }
-    
-    // Se não for JSON, retornar como objeto com a mensagem
-    return { message: text };
-  },
-
-  put: async (url: string, data: any) => {
-    const fullUrl = `${API_BASE_URL}/api${url}`;
-    console.log('PUT request para:', fullUrl);
-    
-    const response = await fetch(fullUrl, {
-      method: 'PUT',
-      headers: getHeaders(),
+  ),
+  put: (endpoint: string, data?: any) =>
+    request(endpoint, 
+    {
+      method: "PUT",
       body: JSON.stringify(data),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
-    return response.json();
-  },
-
-  delete: async (url: string) => {
-    const fullUrl = `${API_BASE_URL}/api${url}`;
-    console.log('DELETE request para:', fullUrl);
-    
-    const response = await fetch(fullUrl, {
-      method: 'DELETE',
-      headers: getHeaders(),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+  ),
+  delete: (endpoint: string) => 
+  request(endpoint, 
+    { 
+      method: "DELETE" 
     }
-    
-    return response.json();
-  },
-};
+  ).then(() => true)
+}
 
-export default api;
+export default api

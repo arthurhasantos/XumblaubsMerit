@@ -1,117 +1,128 @@
-'use client';
+"use client"
 
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, ReactNode } from "react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import api from "@/services/api"
 
 interface User {
-  id: number;
-  name: string;
-  email: string;
-  roles: string[];
+  id: number
+  name: string
+  email: string
+  roles: string[]
 }
 
 interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-  token: string | null;
+  user: User | null
+  loading: boolean
+  login: (email: string, password: string) => Promise<boolean>
+  logout: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>(undefined)
 
+/**
+ * Hook de acesso ao contexto de autenticação.
+ * Garante que o hook só é usado dentro do provider.
+ *
+ * @returns {AuthContextType} Objeto contendo usuário, loading e ações
+ */
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
-interface AuthProviderProps {
-  children: ReactNode;
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider")
+  return ctx
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+/**
+ * Provider responsável por gerenciar:
+ * - Estado de autenticação via React Query
+ * - Login/logout usando cookies httpOnly
+ * - Cache do usuário (auth/me)
+ *
+ * @param {{ children: ReactNode }} props - Elementos a serem renderizados dentro do contexto
+ * @returns {JSX.Element} Provider com valores de autenticação
+ */
+export const AuthProvider = ({ children }: { children: ReactNode }): JSX.Element => {
+  const queryClient = useQueryClient()
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); // Iniciar como true para aguardar verificação do localStorage
-  const [token, setToken] = useState<string | null>(null);
+  /**
+   * Busca inicial do usuário autenticado.
+   * O backend identifica o usuário via cookie httpOnly.
+   *
+   * @returns {User} Usuário autenticado ou null
+   */
+  const { data: user, isLoading: loading } = useQuery<User>({
+    queryKey: ["auth"],
+    queryFn: async () => {
+      return await api.get("/auth/me")
+    },
+    retry: false// evita loops em caso de 401
+  })
 
-  // Verificar se há token salvo no localStorage ao carregar
-  useEffect(() => {
-    const savedToken = localStorage.getItem('authToken');
-    const savedUser = localStorage.getItem('user');
-    
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
+  /**
+   * Mutation responsável por autenticar o usuário.
+   * Envia credenciais, backend devolve cookie httpOnly.
+   *
+   * @param {{ email: string, password: string }} params - Credenciais do usuário
+   * @returns {Promise<void>}
+   */
+  const loginMutation = useMutation({
+    mutationFn: async (params: { email: string; password: string }) => {
+      await api.post("/auth/login", {
+        email: params.email,
+        senha: params.password,
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auth"] })
     }
-    
-    // Marcar como carregado após verificar o localStorage
-    setLoading(false);
-  }, []);
+  })
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, senha: password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const { token: accessToken, tipo, email: userEmail, nome } = data;
-        
-        const userData: User = {
-          id: 1, // ID fixo para ADMIN
-          name: nome || "Administrador",
-          email: userEmail,
-          roles: [tipo]
-        };
-
-        setToken(accessToken);
-        setUser(userData);
-        
-        // Salvar no localStorage
-        localStorage.setItem('authToken', accessToken);
-        localStorage.setItem('user', JSON.stringify(userData));
-        
-        setLoading(false);
-        return true;
-      } else {
-        setLoading(false);
-        return false;
-      }
-    } catch (error) {
-      console.error('Erro no login:', error);
-      setLoading(false);
-      return false;
+  /**
+   * Mutation responsável por remover sessão.
+   * Backend apaga o cookie httpOnly.
+   *
+   * @returns {Promise<void>}
+   */
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await api.post("/auth/logout")
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auth"] })
     }
-  };
-
-  const logout = (): void => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-  };
+  })
 
   const value: AuthContextType = {
     user,
     loading,
-    login,
-    logout,
-    token,
-  };
+     /**
+     * Efetua login usando cookies httpOnly.
+     *
+     * @param {string} email
+     * @param {string} password
+     * @returns {Promise<boolean>} true se autenticado, false se falhou
+     */
+    login: async (email: string, password: string): Promise<boolean> => {
+        try {
+          await loginMutation.mutateAsync({ email, password })
+          return true
+        } catch {
+          return false
+        }
+    },
+    /**
+     * Efetua logout limpando o cookie no backend.
+     *
+     * @returns {Promise<void>}
+     */
+    logout: async (): Promise<void> => {
+      await logoutMutation.mutateAsync()
+    }
+  }
 
   return (
     <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
-  );
-};
+  )
+}
